@@ -1,4 +1,4 @@
-const CACHE_NAME = 'xvaccine-planner-v1';
+const CACHE_NAME = 'xvaccine-planner-v2';
 const urlsToCache = [
   './index.html',
   './assets/css/style.css',
