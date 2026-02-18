@@ -1,6 +1,7 @@
 const CACHE_NAME = 'xvaccine-planner-v1';
 const urlsToCache = [
-  './xvaccine-planner.html',
+  './index.html',
+  './assets/css/style.css',
   './manifest.json',
   'https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Source+Sans+3:wght@300;400;600;700&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
