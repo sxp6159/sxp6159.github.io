@@ -20,14 +20,14 @@
  
     {
       "src": "/screenshots/screenshot.png",
-      "sizes": "945×771",
+      "sizes": "945x771",
       "type": "image/png",
       "form_factor": "wide",
       "label": "App dashboard on desktop"
     },
     {
       "src": "/screenshots/screenshot.png",
-      "sizes": "945×771",
+      "sizes": "945x771",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Full view with features"
@@ -35,14 +35,14 @@
 
     {
       "src": "/screenshots/screenshot.png",
-      "sizes": "945×771",
+      "sizes": "945x771",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Mobile home screen"
     },
     {
       "src": "/screenshots/screenshot.png",
-      "sizes": "945×771",
+      "sizes": "945x771",
       "type": "image/png",
       "label": "Mobile app in use"
     }
