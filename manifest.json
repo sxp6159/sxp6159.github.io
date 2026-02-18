@@ -2,7 +2,7 @@
   "name": "xVaccine Treatment Planner",
   "short_name": "xVaccine",
   "description": "Schedule and manage your xVaccine vaccination appointments",
-  "start_url": "./xvaccine-planner.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fafdf9",
   "theme_color": "#0a4d3c",
@@ -22,5 +22,34 @@
     }
   ],
   "categories": ["health", "medical", "lifestyle"],
-  "screenshots": []
+  "screenshots": [
+ 
+    {
+      "src": "/screenshots/screenshot.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "App dashboard on desktop"
+    },
+    {
+      "src": "/screenshots/screenshot.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Full view with features"
+    },
+
+    {
+      "src": "/screenshots/screenshot.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile home screen"
+    },
+    {
+      "src": "/screenshots/screenshot.png",
+      "sizes": "400x780",
+      "type": "image/png",
+      "label": "Mobile app in use"
+    }
 }
