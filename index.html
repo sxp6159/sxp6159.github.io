@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="xVaccine Treatment Planner - Schedule and manage your vaccination appointments">
+    <meta name="theme-color" content="#0a4d3c">
+    <title>xVaccine Treatment Planner</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #0a4d3c;
+            --secondary-green: #168f6f;
+            --light-green: #a8dac7;
+            --accent-yellow: #f4d35e;
+            --background: #fafdf9;
+            --card-bg: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --border: #e0e0e0;
+            --shadow: rgba(10, 77, 60, 0.08);
+            --target-date: #4ade80;
+            --flexible-window: #fef3c7;
+        }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #f0f9f4 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            background: var(--primary-green);
+            color: white;
+            padding: 2rem 2rem 3rem;
+            margin: -2rem -2rem 3rem;
+            border-radius: 0 0 2rem 2rem;
+            box-shadow: 0 8px 24px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+            position: relative;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 24px rgba(10, 77, 60, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .step-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--secondary-green);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-family: 'Source Sans 3', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        input[type="date"]:focus {
+            outline: none;
+            border-color: var(--secondary-green);
+            box-shadow: 0 0 0 3px rgba(22, 143, 111, 0.1);
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Source Sans 3', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--secondary-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-green);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(10, 77, 60, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-green);
+            border: 2px solid var(--primary-green);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .schedule-grid {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .dose-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+            border: 2px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1.5rem;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .dose-card:hover {
+            border-color: var(--secondary-green);
+        }
+
+        .dose-number {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'DM Serif Display', serif;
+        }
+
+        .dose-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .dose-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-green);
+        }
+
+        .dose-date {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .dose-window {
+            font-size: 0.85rem;
+            color: #666;
+            padding: 0.25rem 0.75rem;
+            background: var(--flexible-window);
+            border-radius: 1rem;
+            display: inline-block;
+        }
+
+        .calendar-wrapper {
+            margin-top: 1rem;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .calendar-header {
+            text-align: center;
+            font-weight: 700;
+            padding: 0.75rem;
+            color: var(--primary-green);
+            font-size: 0.9rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .calendar-day:hover:not(.empty):not(.other-month) {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .calendar-day.empty {
+            cursor: default;
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+            cursor: default;
+        }
+
+        .calendar-day.target {
+            background: var(--target-date);
+            color: white;
+            font-weight: 700;
+            border-color: #22c55e;
+        }
+
+        .calendar-day.flexible {
+            background: var(--flexible-window);
+            border-color: #fbbf24;
+        }
+
+        .calendar-day.selected {
+            background: var(--secondary-green);
+            color: white;
+            font-weight: 700;
+        }
+
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .month-nav h3 {
+            font-family: 'DM Serif Display', serif;
+            color: var(--primary-green);
+            font-size: 1.3rem;
+        }
+
+        .month-nav button {
+            background: none;
+            border: none;
+            color: var(--primary-green);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .month-nav button:hover {
+            background: rgba(10, 77, 60, 0.1);
+        }
+
+        .legend {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 0.25rem;
+            border: 2px solid;
+        }
+
+        .legend-color.target {
+            background: var(--target-date);
+            border-color: #22c55e;
+        }
+
+        .legend-color.flexible {
+            background: var(--flexible-window);
+            border-color: #fbbf24;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            border-left: 4px solid #0284c7;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: flex-end;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .dose-card {
+                grid-template-columns: auto 1fr;
+                gap: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media print {
+            .btn, .action-buttons, .modal {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>xVaccine Treatment Planner</h1>
+            <p class="subtitle">Schedule and manage your vaccination treatment plan</p>
+        </header>
+
+        <!-- Step 1: Select Start Date -->
+        <div id="step1" class="card">
+            <h2 class="card-title">
+                <span class="step-indicator">1</span>
+                Select Your First Treatment Date
+            </h2>
+            <div class="info-box">
+                Choose the date you'd like to begin your xVaccine treatment. The system will automatically calculate your complete 4-dose schedule.
+            </div>
+            <div class="input-group">
+                <label for="startDate">First Treatment Date:</label>
+                <input type="date" id="startDate" required>
+            </div>
+            <button class="btn btn-primary" onclick="generateSchedule()">
+                <span>Generate Treatment Schedule</span>
+                <span>→</span>
+            </button>
+        </div>
+
+        <!-- Step 2: Review and Modify Schedule -->
+        <div id="step2" class="card hidden">
+            <h2 class="card-title">
+                <span class="step-indicator">2</span>
+                Your Treatment Schedule
+            </h2>
+            <div class="info-box">
+                Target Treatment Dates are shown in <strong style="color: #22c55e;">green</strong>. If you cannot attend on the target date, select an alternative within the <strong style="color: #f59e0b;">flexible window (±7 days)</strong>.
+            </div>
+            <div id="scheduleList" class="schedule-grid"></div>
+            
+            <div class="warning-box hidden" id="bridgingWarning">
+                ⚠️ <strong>Note:</strong> If you cannot receive treatment during the Flexible Dosing Window, please consult with your healthcare provider about oral bridging options.
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="showStep1()">
+                    ← Modify Start Date
+                </button>
+                <button class="btn btn-primary" onclick="downloadPDF()">
+                    📄 Download PDF
+                </button>
+                <button class="btn btn-primary" onclick="downloadAllICS()">
+                    📅 Export to Calendar
+                </button>
+            </div>
+        </div>
+
+        <!-- Calendar Modal -->
+        <div id="calendarModal" class="modal">
+            <div class="modal-content">
+                <h3 class="modal-title" id="modalTitle">Select Treatment Date</h3>
+                <div class="calendar-wrapper">
+                    <div class="month-nav">
+                        <button onclick="previousMonth()">‹</button>
+                        <h3 id="monthYear"></h3>
+                        <button onclick="nextMonth()">›</button>
+                    </div>
+                    <div class="calendar" id="calendar"></div>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color target"></div>
+                            <span>Target Date</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color flexible"></div>
+                            <span>Flexible Window (±7 days)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Treatment schedule configuration
+        const TREATMENT_CONFIG = {
+            doses: [
+                { number: 1, dayOffset: 0, name: "First Dose" },
+                { number: 2, dayOffset: 7, name: "Second Dose" },
+                { number: 3, dayOffset: 14, name: "Third Dose" },
+                { number: 4, dayOffset: 28, name: "Fourth Dose" }
+            ],
+            flexibleWindowDays: 7
+        };
+
+        let schedule = [];
+        let currentDoseIndex = null;
+        let currentCalendarMonth = new Date();
+
+        function generateSchedule() {
+            const startDateInput = document.getElementById('startDate').value;
+            if (!startDateInput) {
+                alert('Please select a start date');
+                return;
+            }
+
+            const startDate = new Date(startDateInput + 'T00:00:00');
+            schedule = TREATMENT_CONFIG.doses.map(dose => ({
+                ...dose,
+                targetDate: addDays(startDate, dose.dayOffset),
+                selectedDate: addDays(startDate, dose.dayOffset),
+                windowStart: addDays(startDate, dose.dayOffset - TREATMENT_CONFIG.flexibleWindowDays),
+                windowEnd: addDays(startDate, dose.dayOffset + TREATMENT_CONFIG.flexibleWindowDays)
+            }));
+
+            displaySchedule();
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+        }
+
+        function displaySchedule() {
+            const container = document.getElementById('scheduleList');
+            container.innerHTML = '';
+
+            schedule.forEach((dose, index) => {
+                const card = document.createElement('div');
+                card.className = 'dose-card';
+                
+                const isModified = dose.selectedDate.getTime() !== dose.targetDate.getTime();
+                const isOutsideWindow = !isDateInRange(dose.selectedDate, dose.windowStart, dose.windowEnd);
+
+                card.innerHTML = `
+                    <div class="dose-number">${dose.number}</div>
+                    <div class="dose-info">
+                        <div class="dose-title">${dose.name}</div>
+                        <div class="dose-date">
+                            ${isModified ? '<strong>Modified:</strong> ' : ''}
+                            ${formatDate(dose.selectedDate)}
+                        </div>
+                        <div class="dose-window">
+                            Target: ${formatDate(dose.targetDate)} 
+                            (Window: ${formatDate(dose.windowStart)} - ${formatDate(dose.windowEnd)})
+                        </div>
+                        ${isOutsideWindow ? '<div style="color: #dc2626; font-weight: 600; margin-top: 0.5rem;">⚠️ Outside flexible window - consult provider</div>' : ''}
+                    </div>
+                    <button class="btn btn-secondary" onclick="openCalendar(${index})" style="white-space: nowrap;">
+                        Change Date
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+
+            // Show warning if any dose is outside flexible window
+            const hasOutsideWindow = schedule.some(dose => 
+                !isDateInRange(dose.selectedDate, dose.windowStart, dose.windowEnd)
+            );
+            document.getElementById('bridgingWarning').classList.toggle('hidden', !hasOutsideWindow);
+        }
+
+        function openCalendar(doseIndex) {
+            currentDoseIndex = doseIndex;
+            const dose = schedule[doseIndex];
+            document.getElementById('modalTitle').textContent = `Select Date for ${dose.name}`;
+            currentCalendarMonth = new Date(dose.selectedDate);
+            renderCalendar();
+            document.getElementById('calendarModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('calendarModal').classList.remove('active');
+        }
+
+        function renderCalendar() {
+            const dose = schedule[currentDoseIndex];
+            const year = currentCalendarMonth.getFullYear();
+            const month = currentCalendarMonth.getMonth();
+            
+            document.getElementById('monthYear').textContent = 
+                currentCalendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const prevLastDay = new Date(year, month, 0);
+            
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+
+            // Headers
+            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-header';
+                header.textContent = day;
+                calendar.appendChild(header);
+            });
+
+            // Previous month days
+            const firstDayOfWeek = firstDay.getDay();
+            for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = prevLastDay.getDate() - i;
+                calendar.appendChild(day);
+            }
+
+            // Current month days
+            for (let i = 1; i <= lastDay.getDate(); i++) {
+                const day = document.createElement('div');
+                const currentDate = new Date(year, month, i);
+                day.className = 'calendar-day';
+                day.textContent = i;
+
+                if (isSameDay(currentDate, dose.targetDate)) {
+                    day.classList.add('target');
+                } else if (isDateInRange(currentDate, dose.windowStart, dose.windowEnd)) {
+                    day.classList.add('flexible');
+                }
+
+                if (isSameDay(currentDate, dose.selectedDate)) {
+                    day.classList.add('selected');
+                }
+
+                day.onclick = () => selectDate(currentDate);
+                calendar.appendChild(day);
+            }
+
+            // Next month days
+            const remainingDays = 42 - calendar.children.length + 7; // +7 for headers
+            for (let i = 1; i <= remainingDays; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = i;
+                calendar.appendChild(day);
+            }
+        }
+
+        function previousMonth() {
+            currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function selectDate(date) {
+            schedule[currentDoseIndex].selectedDate = new Date(date);
+            displaySchedule();
+            closeModal();
+        }
+
+        function showStep1() {
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('step2').classList.add('hidden');
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Header
+            doc.setFillColor(10, 77, 60);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.text('xVaccine Treatment Plan', 20, 25);
+            
+            // Patient info
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 50);
+            
+            // Schedule table
+            let yPos = 70;
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('Treatment Schedule', 20, yPos);
+            yPos += 10;
+            
+            schedule.forEach((dose, index) => {
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text(`${dose.name}`, 20, yPos);
+                
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(10);
+                yPos += 7;
+                doc.text(`Scheduled Date: ${formatDate(dose.selectedDate)}`, 30, yPos);
+                yPos += 5;
+                doc.text(`Target Date: ${formatDate(dose.targetDate)}`, 30, yPos);
+                yPos += 5;
+                doc.text(`Flexible Window: ${formatDate(dose.windowStart)} to ${formatDate(dose.windowEnd)}`, 30, yPos);
+                
+                const isOutsideWindow = !isDateInRange(dose.selectedDate, dose.windowStart, dose.windowEnd);
+                if (isOutsideWindow) {
+                    doc.setTextColor(220, 38, 38);
+                    yPos += 5;
+                    doc.text('⚠ Outside flexible window - consult healthcare provider', 30, yPos);
+                    doc.setTextColor(0, 0, 0);
+                }
+                
+                yPos += 15;
+                
+                if (yPos > 250) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+            });
+            
+            // Important notes
+            yPos += 10;
+            if (yPos > 240) {
+                doc.addPage();
+                yPos = 20;
+            }
+            
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('Important Notes:', 20, yPos);
+            yPos += 10;
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            const notes = [
+                '• Target dates are optimal for treatment efficacy',
+                '• Flexible window allows ±7 days from target date',
+                '• If unable to attend within flexible window, consult your healthcare provider',
+                '• Bring this schedule to all appointments',
+                '• Contact your healthcare provider if you have questions'
+            ];
+            
+            notes.forEach(note => {
+                doc.text(note, 20, yPos);
+                yPos += 7;
+            });
+            
+            doc.save('xVaccine-Treatment-Plan.pdf');
+        }
+
+        function downloadAllICS() {
+            schedule.forEach(dose => {
+                downloadICS(dose);
+            });
+        }
+
+        function downloadICS(dose) {
+            const event = {
+                start: dose.selectedDate,
+                duration: 60, // 1 hour appointment
+                title: `xVaccine - ${dose.name}`,
+                description: `xVaccine Treatment - ${dose.name}\\n\\nTarget Date: ${formatDate(dose.targetDate)}\\nFlexible Window: ${formatDate(dose.windowStart)} to ${formatDate(dose.windowEnd)}\\n\\nPlease arrive 15 minutes early for check-in.`,
+                location: 'Healthcare Provider Office',
+                url: ''
+            };
+
+            const icsContent = generateICS(event);
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `xVaccine-Dose-${dose.number}.ics`;
+            link.click();
+        }
+
+        function generateICS(event) {
+            const startDate = formatICSDate(event.start);
+            const endDate = formatICSDate(addMinutes(event.start, event.duration));
+            const now = formatICSDate(new Date());
+
+            return `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//xVaccine Treatment Planner//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+DTSTART:${startDate}
+DTEND:${endDate}
+DTSTAMP:${now}
+UID:${Date.now()}@xvaccine-planner
+SUMMARY:${event.title}
+DESCRIPTION:${event.description}
+LOCATION:${event.location}
+STATUS:CONFIRMED
+SEQUENCE:0
+BEGIN:VALARM
+TRIGGER:-PT24H
+ACTION:DISPLAY
+DESCRIPTION:Reminder: ${event.title} tomorrow
+END:VALARM
+END:VEVENT
+END:VCALENDAR`;
+        }
+
+        // Utility functions
+        function addDays(date, days) {
+            const result = new Date(date);
+            result.setDate(result.getDate() + days);
+            return result;
+        }
+
+        function addMinutes(date, minutes) {
+            return new Date(date.getTime() + minutes * 60000);
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'short',
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function formatICSDate(date) {
+            const pad = (n) => n.toString().padStart(2, '0');
+            return date.getFullYear() +
+                pad(date.getMonth() + 1) +
+                pad(date.getDate()) + 'T' +
+                pad(date.getHours()) +
+                pad(date.getMinutes()) +
+                pad(date.getSeconds());
+        }
+
+        function isSameDay(date1, date2) {
+            return date1.getFullYear() === date2.getFullYear() &&
+                   date1.getMonth() === date2.getMonth() &&
+                   date1.getDate() === date2.getDate();
+        }
+
+        function isDateInRange(date, start, end) {
+            return date >= start && date <= end;
+        }
+
+        // Set minimum date to today
+        document.getElementById('startDate').min = new Date().toISOString().split('T')[0];
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {
+                console.log('Service worker registration optional');
+            });
+        }
+    </script>
+</body>
+</html>
