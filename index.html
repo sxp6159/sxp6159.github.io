@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,9 @@
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Source+Sans+3:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
@@ -19,8 +22,8 @@
         }
 
         :root {
-            --primary-green: #0a4d3c;
-            --secondary-green: #168f6f;
+            --primary-green: #f25218;
+            --gsk-orange: #f36633;
             --light-green: #a8dac7;
             --accent-yellow: #f4d35e;
             --background: #fafdf9;
@@ -49,8 +52,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         header {
@@ -71,7 +81,7 @@
             right: -10%;
             width: 300px;
             height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
             border-radius: 50%;
         }
 
@@ -121,7 +131,7 @@
             justify-content: center;
             width: 32px;
             height: 32px;
-            background: var(--secondary-green);
+            background: var(--gsk-orange);
             color: white;
             border-radius: 50%;
             font-size: 0.9rem;
@@ -152,7 +162,7 @@
 
         input[type="date"]:focus {
             outline: none;
-            border-color: var(--secondary-green);
+            border-color: var(--gsk-orange);
             box-shadow: 0 0 0 3px rgba(22, 143, 111, 0.1);
         }
 
@@ -171,7 +181,7 @@
         }
 
         .btn-primary {
-            background: var(--secondary-green);
+            background: var(--gsk-orange);
             color: white;
         }
 
@@ -211,7 +221,7 @@
         }
 
         .dose-card:hover {
-            border-color: var(--secondary-green);
+            border-color: var(--gsk-orange);
         }
 
         .dose-number {
@@ -313,7 +323,7 @@
         }
 
         .calendar-day.selected {
-            background: var(--secondary-green);
+            background: var(--gsk-orange);
             color: white;
             font-weight: 700;
         }
@@ -437,8 +447,15 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-title {
@@ -480,12 +497,16 @@
         }
 
         @media print {
-            .btn, .action-buttons, .modal {
+
+            .btn,
+            .action-buttons,
+            .modal {
                 display: none !important;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -500,7 +521,8 @@
                 Select Your First Treatment Date
             </h2>
             <div class="info-box">
-                Choose the date you'd like to begin your xVaccine treatment. The system will automatically calculate your complete 4-dose schedule.
+                Choose the date you'd like to begin your xVaccine treatment. The system will automatically calculate
+                your complete 4-dose schedule.
             </div>
             <div class="input-group">
                 <label for="startDate">First Treatment Date:</label>
@@ -519,12 +541,15 @@
                 Your Treatment Schedule
             </h2>
             <div class="info-box">
-                Target Treatment Dates are shown in <strong style="color: #22c55e;">green</strong>. If you cannot attend on the target date, select an alternative within the <strong style="color: #f59e0b;">flexible window (±7 days)</strong>.
+                Target Treatment Dates are shown in <strong style="color: #22c55e;">green</strong>. If you cannot attend
+                on the target date, select an alternative within the <strong style="color: #f59e0b;">flexible window (±7
+                    days)</strong>.
             </div>
             <div id="scheduleList" class="schedule-grid"></div>
-            
+
             <div class="warning-box hidden" id="bridgingWarning">
-                ⚠️ <strong>Note:</strong> If you cannot receive treatment during the Flexible Dosing Window, please consult with your healthcare provider about oral bridging options.
+                ⚠️ <strong>Note:</strong> If you cannot receive treatment during the Flexible Dosing Window, please
+                consult with your healthcare provider about oral bridging options.
             </div>
 
             <div class="action-buttons">
@@ -613,7 +638,7 @@
             schedule.forEach((dose, index) => {
                 const card = document.createElement('div');
                 card.className = 'dose-card';
-                
+
                 const isModified = dose.selectedDate.getTime() !== dose.targetDate.getTime();
                 const isOutsideWindow = !isDateInRange(dose.selectedDate, dose.windowStart, dose.windowEnd);
 
@@ -639,7 +664,7 @@
             });
 
             // Show warning if any dose is outside flexible window
-            const hasOutsideWindow = schedule.some(dose => 
+            const hasOutsideWindow = schedule.some(dose =>
                 !isDateInRange(dose.selectedDate, dose.windowStart, dose.windowEnd)
             );
             document.getElementById('bridgingWarning').classList.toggle('hidden', !hasOutsideWindow);
@@ -662,14 +687,14 @@
             const dose = schedule[currentDoseIndex];
             const year = currentCalendarMonth.getFullYear();
             const month = currentCalendarMonth.getMonth();
-            
-            document.getElementById('monthYear').textContent = 
+
+            document.getElementById('monthYear').textContent =
                 currentCalendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
             const prevLastDay = new Date(year, month, 0);
-            
+
             const calendar = document.getElementById('calendar');
             calendar.innerHTML = '';
 
@@ -745,7 +770,7 @@
         function downloadPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
+
             // Header
             doc.setFillColor(10, 77, 60);
             doc.rect(0, 0, 210, 40, 'F');
@@ -753,24 +778,24 @@
             doc.setFontSize(24);
             doc.setFont(undefined, 'bold');
             doc.text('xVaccine Treatment Plan', 20, 25);
-            
+
             // Patient info
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(10);
             doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 50);
-            
+
             // Schedule table
             let yPos = 70;
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
             doc.text('Treatment Schedule', 20, yPos);
             yPos += 10;
-            
+
             schedule.forEach((dose, index) => {
                 doc.setFontSize(12);
                 doc.setFont(undefined, 'bold');
                 doc.text(`${dose.name}`, 20, yPos);
-                
+
                 doc.setFont(undefined, 'normal');
                 doc.setFontSize(10);
                 yPos += 7;
@@ -779,7 +804,7 @@
                 doc.text(`Target Date: ${formatDate(dose.targetDate)}`, 30, yPos);
                 yPos += 5;
                 doc.text(`Flexible Window: ${formatDate(dose.windowStart)} to ${formatDate(dose.windowEnd)}`, 30, yPos);
-                
+
                 const isOutsideWindow = !isDateInRange(dose.selectedDate, dose.windowStart, dose.windowEnd);
                 if (isOutsideWindow) {
                     doc.setTextColor(220, 38, 38);
@@ -787,27 +812,27 @@
                     doc.text('⚠ Outside flexible window - consult healthcare provider', 30, yPos);
                     doc.setTextColor(0, 0, 0);
                 }
-                
+
                 yPos += 15;
-                
+
                 if (yPos > 250) {
                     doc.addPage();
                     yPos = 20;
                 }
             });
-            
+
             // Important notes
             yPos += 10;
             if (yPos > 240) {
                 doc.addPage();
                 yPos = 20;
             }
-            
+
             doc.setFontSize(14);
             doc.setFont(undefined, 'bold');
             doc.text('Important Notes:', 20, yPos);
             yPos += 10;
-            
+
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
             const notes = [
@@ -817,12 +842,12 @@
                 '• Bring this schedule to all appointments',
                 '• Contact your healthcare provider if you have questions'
             ];
-            
+
             notes.forEach(note => {
                 doc.text(note, 20, yPos);
                 yPos += 7;
             });
-            
+
             doc.save('xVaccine-Treatment-Plan.pdf');
         }
 
@@ -891,11 +916,11 @@ END:VCALENDAR`;
         }
 
         function formatDate(date) {
-            return date.toLocaleDateString('en-US', { 
+            return date.toLocaleDateString('en-US', {
                 weekday: 'short',
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
         }
 
@@ -911,8 +936,8 @@ END:VCALENDAR`;
 
         function isSameDay(date1, date2) {
             return date1.getFullYear() === date2.getFullYear() &&
-                   date1.getMonth() === date2.getMonth() &&
-                   date1.getDate() === date2.getDate();
+                date1.getMonth() === date2.getMonth() &&
+                date1.getDate() === date2.getDate();
         }
 
         function isDateInRange(date, start, end) {
@@ -930,4 +955,5 @@ END:VCALENDAR`;
         }
     </script>
 </body>
+
 </html>
