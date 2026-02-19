@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
+
 <body>
     <div class="container">
         <header>
@@ -49,154 +50,170 @@
                     </div>
                 </div>
             </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="resetApplication()">
+                    ↺ Start Over
+                </button>
+            </div>
         </div>
 
         <!-- Step 2a: New Treatment - Lead-in Selection -->
-        <h2 class="card-title">
-            <span class="step-indicator">2</span>
-            Treatment Initiation Method
-        </h2>
-        <div class="info-box">
-            Choose how you will begin your long-acting injectable treatment.
-        </div>
-        <div class="option-cards">
-            <div class="option-card" onclick="selectLeadIn('oral')">
-                <div class="option-icon">💊</div>
-                <div class="option-title">With Oral Lead-in</div>
-                <div class="option-description">
-                    Complete 28 days of oral tablets before first injection
-                </div>
+        <div id="step2a" class="card hidden">
+            <h2 class="card-title">
+                <span class="step-indicator">2</span>
+                Treatment Initiation Method
+            </h2>
+            <div class="info-box">
+                Choose how you will begin your long-acting injectable treatment.
             </div>
-            <div class="option-card" onclick="selectLeadIn('direct')">
-                <div class="option-icon">💉</div>
-                <div class="option-title">Direct to Injections</div>
-                <div class="option-description">
-                    Start immediately with monthly injections
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Step 2b: Oral Lead-in Confirmation -->
-    <div id="step2b" class="card hidden">
-        <h2 class="card-title">
-            <span class="step-indicator">2</span>
-            Oral Lead-in Completion
-        </h2>
-        <div class="warning-box">
-            <strong>Important:</strong> Before scheduling injections, you must complete at least 28 days of oral lead-in
-            therapy:
-            <ul>
-                <li>1 tablet of cabotegravir (30mg) daily</li>
-                <li>1 tablet of rilpivirine (25mg) daily</li>
-            </ul>
-        </div>
-        <div class="input-group">
-            <label for="oralCompleteDate">Date Oral Lead-in Completed (Day 28):</label>
-            <input type="date" id="oralCompleteDate" required>
-        </div>
-        <button class="btn btn-primary" onclick="proceedFromOralLeadIn()">
-            Continue to Schedule
-        </button>
-        <button class="btn btn-secondary" onclick="goBack('step2a')">
-            ← Back
-        </button>
-    </div>
-
-    <!-- Step 3: Target Date Selection -->
-    <div id="step3" class="card hidden">
-        <h2 class="card-title">
-            <span class="step-indicator">3</span>
-            Select Target Treatment Date
-        </h2>
-        <div class="info-box">
-            <strong>Choose your Target Treatment Date carefully:</strong>
-            <ul>
-                <li>This date will be used for all future injections each month</li>
-                <li>Select a day between the 1st and 28th for consistency in shorter months</li>
-                <li>Choose a time that aligns with your clinic hours</li>
-                <li>Injections can be given ±7 days from this target if needed</li>
-            </ul>
-        </div>
-        <div class="input-group">
-            <label for="targetDate">Target Treatment Date:</label>
-            <input type="date" id="targetDate" required>
-        </div>
-        <div class="input-group">
-            <label for="targetTime">Preferred Appointment Time:</label>
-            <input type="time" id="targetTime" value="10:00" required>
-        </div>
-        <div id="dateWarning" class="warning-box hidden">
-            ⚠️ <strong>Note:</strong> Selected day is after the 28th. This may cause scheduling issues in months with
-            fewer than 31 days. Consider selecting an earlier day of the month.
-        </div>
-        <button class="btn btn-primary" onclick="generateSchedule()">
-            Generate Schedule
-        </button>
-        <button class="btn btn-secondary" onclick="goBackFromStep3()">
-            ← Back
-        </button>
-    </div>
-
-    <!-- Step 4: Review Schedule -->
-    <div id="step4" class="card hidden">
-        <h2 class="card-title">
-            <span class="step-indicator">4</span>
-            Your Treatment Schedule
-        </h2>
-        <div class="info-box">
-            <strong>Target Treatment Date</strong> is shown in <strong style="color: #22c55e;">green</strong>.
-            If needed, you can schedule within the <strong style="color: #fbbf24;">Flexible Window (±7 days)</strong>.
-            Try to return to your Target Treatment Date for subsequent appointments.
-        </div>
-        <div id="scheduleList" class="schedule-grid"></div>
-
-        <div class="load-more hidden" id="loadMoreContainer">
-            <button class="btn btn-outline" onclick="loadMoreAppointments()">
-                Load Next 3 Appointments
-            </button>
-        </div>
-
-        <div class="action-buttons">
-            <button class="btn btn-secondary" onclick="goBack('step3')">
-                ← Modify Settings
-            </button>
-            <button class="btn btn-primary" onclick="downloadPDF()">
-                📄 Download PDF
-            </button>
-            <button class="btn btn-primary" onclick="downloadAllICS()">
-                📅 Export to Calendar
-            </button>
-        </div>
-    </div>
-
-    <!-- Calendar Modal -->
-    <div id="calendarModal" class="modal">
-        <div class="modal-content">
-            <h3 class="modal-title" id="modalTitle">Select Appointment Date</h3>
-            <div class="calendar-wrapper">
-                <div class="month-nav">
-                    <button onclick="previousMonth()">‹</button>
-                    <h3 id="monthYear"></h3>
-                    <button onclick="nextMonth()">›</button>
-                </div>
-                <div class="calendar" id="calendar"></div>
-                <div class="legend">
-                    <div class="legend-item">
-                        <div class="legend-color target"></div>
-                        <span>Target Date</span>
+            <div class="option-cards">
+                <div class="option-card" onclick="selectLeadIn('oral')">
+                    <div class="option-icon">💊</div>
+                    <div class="option-title">With Oral Lead-in</div>
+                    <div class="option-description">
+                        Complete 28 days of oral tablets before first injection
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-color flexible"></div>
-                        <span>Flexible Window (±7 days)</span>
+                </div>
+                <div class="option-card" onclick="selectLeadIn('direct')">
+                    <div class="option-icon">💉</div>
+                    <div class="option-title">Direct to Injections</div>
+                    <div class="option-description">
+                        Start immediately with monthly injections
                     </div>
                 </div>
             </div>
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="goBack('step1')">
+                    ← Back to Treatment Type
+                </button>
             </div>
         </div>
-    </div>
+
+        <!-- Step 2b: Oral Lead-in Confirmation -->
+        <div id="step2b" class="card hidden">
+            <h2 class="card-title">
+                <span class="step-indicator">2</span>
+                Oral Lead-in Completion
+            </h2>
+            <div class="warning-box">
+                <strong>Important:</strong> Before scheduling injections, you must complete at least 28 days of oral
+                lead-in therapy:
+                <ul>
+                    <li>1 tablet of cabotegravir (30mg) daily</li>
+                    <li>1 tablet of rilpivirine (25mg) daily</li>
+                </ul>
+            </div>
+            <div class="input-group">
+                <label for="oralCompleteDate">Date Oral Lead-in Completed (Day 28):</label>
+                <input type="date" id="oralCompleteDate" required>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="goBack('step2a')">
+                    ← Back to Initiation Method
+                </button>
+                <button class="btn btn-primary" onclick="proceedFromOralLeadIn()">
+                    Continue to Schedule
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Target Date Selection -->
+        <div id="step3" class="card hidden">
+            <h2 class="card-title">
+                <span class="step-indicator">3</span>
+                Select Target Treatment Date
+            </h2>
+            <div class="info-box">
+                <strong>Choose your Target Treatment Date carefully:</strong>
+                <ul>
+                    <li>This date will be used for all future injections each month</li>
+                    <li>Select a day between the 1st and 28th for consistency in shorter months</li>
+                    <li>Choose a time that aligns with your clinic hours</li>
+                    <li>Injections can be given ±7 days from this target if needed</li>
+                </ul>
+            </div>
+            <div class="input-group">
+                <label for="targetDate">Target Treatment Date:</label>
+                <input type="date" id="targetDate" required>
+            </div>
+            <div class="input-group">
+                <label for="targetTime">Preferred Appointment Time:</label>
+                <input type="time" id="targetTime" value="10:00" required>
+            </div>
+            <div id="dateWarning" class="warning-box hidden">
+                ⚠️ <strong>Note:</strong> Selected day is after the 28th. This may cause scheduling issues in months
+                with fewer than 31 days. Consider selecting an earlier day of the month.
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="goBackFromStep3()">
+                    ← Back
+                </button>
+                <button class="btn btn-primary" onclick="generateSchedule()">
+                    Generate Schedule
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 4: Review Schedule -->
+        <div id="step4" class="card hidden">
+            <h2 class="card-title">
+                <span class="step-indicator">4</span>
+                Your Treatment Schedule
+            </h2>
+            <div class="info-box">
+                <strong>Target Treatment Date</strong> is shown in <strong style="color: #22c55e;">green</strong>.
+                If needed, you can schedule within the <strong style="color: #fbbf24;">Flexible Window (±7
+                    days)</strong>.
+                Try to return to your Target Treatment Date for subsequent appointments.
+            </div>
+            <div id="scheduleList" class="schedule-grid"></div>
+
+            <div class="load-more hidden" id="loadMoreContainer">
+                <button class="btn btn-outline" onclick="loadMoreAppointments()">
+                    Load Next 3 Appointments
+                </button>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="goBack('step3')">
+                    ← Back to Target Date
+                </button>
+                <button class="btn btn-primary" onclick="downloadPDF()">
+                    📄 Download PDF
+                </button>
+                <button class="btn btn-primary" onclick="downloadAllICS()">
+                    📅 Export to Calendar
+                </button>
+            </div>
+        </div>
+
+        <!-- Calendar Modal -->
+        <div id="calendarModal" class="modal">
+            <div class="modal-content">
+                <h3 class="modal-title" id="modalTitle">Select Appointment Date</h3>
+                <div class="calendar-wrapper">
+                    <div class="month-nav">
+                        <button onclick="previousMonth()">‹</button>
+                        <h3 id="monthYear"></h3>
+                        <button onclick="nextMonth()">›</button>
+                    </div>
+                    <div class="calendar" id="calendar"></div>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color target"></div>
+                            <span>Target Date</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color flexible"></div>
+                            <span>Flexible Window (±7 days)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -214,8 +231,10 @@
             document.getElementById('step1').classList.add('hidden');
 
             if (type === 'new') {
+                // Show treatment initiation method selection for new treatments
                 document.getElementById('step2a').classList.remove('hidden');
             } else {
+                // Continuation treatments skip directly to target date selection
                 document.getElementById('step3').classList.remove('hidden');
             }
         }
@@ -273,6 +292,28 @@
             } else {
                 goBack('step1');
             }
+        }
+
+        function resetApplication() {
+            // Reset all state
+            treatmentType = null;
+            leadInType = null;
+            schedule = [];
+            currentAppointmentIndex = null;
+            visibleAppointments = 3;
+
+            // Clear form inputs
+            document.getElementById('targetDate').value = '';
+            document.getElementById('targetTime').value = '10:00';
+            document.getElementById('oralCompleteDate').value = '';
+            document.getElementById('dateWarning').classList.add('hidden');
+
+            // Reset to step 1
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('step2a').classList.add('hidden');
+            document.getElementById('step2b').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.add('hidden');
         }
 
         // Check if selected day is after 28th
