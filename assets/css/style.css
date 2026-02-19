@@ -9,6 +9,7 @@
             --gsk-orange: #f36633;
             --light-green: #a8dac7;
             --accent-yellow: #f4d35e;
+            --accent-blue: #3b82f6;
             --background: #fafdf9;
             --card-bg: #ffffff;
             --text-primary: #1a1a1a;
@@ -35,15 +36,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         header {
@@ -64,7 +58,7 @@
             right: -10%;
             width: 300px;
             height: 300px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
             border-radius: 50%;
         }
 
@@ -121,6 +115,52 @@
             font-weight: 600;
         }
 
+        .option-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+            border: 3px solid var(--border);
+            border-radius: 1rem;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .option-card:hover {
+            border-color: var(--gsk-orange);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(10, 77, 60, 0.15);
+        }
+
+        .option-card.selected {
+            border-color: var(--gsk-orange);
+            background: linear-gradient(135deg, #e6f7f1 0%, #d4f1e8 100%);
+        }
+
+        .option-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .option-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.3rem;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .option-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
         .input-group {
             margin-bottom: 1.5rem;
         }
@@ -133,7 +173,9 @@
             font-size: 0.95rem;
         }
 
-        input[type="date"] {
+        input[type="date"],
+        input[type="time"],
+        select {
             width: 100%;
             padding: 0.75rem;
             border: 2px solid var(--border);
@@ -143,7 +185,9 @@
             transition: all 0.3s ease;
         }
 
-        input[type="date"]:focus {
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        select:focus {
             outline: none;
             border-color: var(--gsk-orange);
             box-shadow: 0 0 0 3px rgba(22, 143, 111, 0.1);
@@ -185,66 +229,128 @@
             color: white;
         }
 
+        .btn-outline {
+            background: transparent;
+            color: var(--gsk-orange);
+            border: 2px solid var(--gsk-orange);
+        }
+
+        .btn-outline:hover {
+            background: var(--gsk-orange);
+            color: white;
+        }
+
         .schedule-grid {
             display: grid;
             gap: 1rem;
             margin-bottom: 2rem;
         }
 
-        .dose-card {
+        .appointment-card {
             background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
             border: 2px solid var(--border);
             border-radius: 0.75rem;
             padding: 1.5rem;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 1.5rem;
-            align-items: center;
             transition: all 0.3s ease;
         }
 
-        .dose-card:hover {
+        .appointment-card:hover {
             border-color: var(--gsk-orange);
         }
 
-        .dose-number {
-            width: 60px;
-            height: 60px;
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .appointment-number {
+            width: 50px;
+            height: 50px;
             background: var(--primary-green);
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             font-family: 'DM Serif Display', serif;
         }
 
-        .dose-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+        .appointment-info {
+            flex: 1;
+            margin-left: 1.5rem;
         }
 
-        .dose-title {
+        .appointment-title {
             font-weight: 700;
             font-size: 1.1rem;
             color: var(--primary-green);
+            margin-bottom: 0.5rem;
         }
 
-        .dose-date {
-            font-size: 1rem;
+        .appointment-date {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .appointment-window {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .window-item {
+            font-size: 0.9rem;
+        }
+
+        .window-label {
             color: var(--text-secondary);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.25rem;
         }
 
-        .dose-window {
-            font-size: 0.85rem;
-            color: #666;
-            padding: 0.25rem 0.75rem;
-            background: var(--flexible-window);
-            border-radius: 1rem;
-            display: inline-block;
+        .window-date {
+            color: var(--text-primary);
+        }
+
+        .window-item.earliest .window-date {
+            color: #dc2626;
+        }
+
+        .window-item.target .window-date {
+            color: #16a34a;
+            font-weight: 700;
+        }
+
+        .window-item.latest .window-date {
+            color: #ea580c;
+        }
+
+        .change-date-btn {
+            background: white;
+            color: var(--primary-green);
+            border: 2px solid var(--primary-green);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .change-date-btn:hover {
+            background: var(--primary-green);
+            color: white;
         }
 
         .calendar-wrapper {
@@ -392,12 +498,30 @@
             font-size: 0.95rem;
         }
 
+        .info-box ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .info-box li {
+            margin-bottom: 0.25rem;
+        }
+
         .warning-box {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             border-left: 4px solid #f59e0b;
             padding: 1rem 1.5rem;
             border-radius: 0.5rem;
             margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 4px solid #10b981;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
             font-size: 0.95rem;
         }
 
@@ -425,20 +549,15 @@
             border-radius: 1rem;
             max-width: 500px;
             width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideUp 0.3s ease;
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .modal-title {
@@ -455,6 +574,11 @@
             justify-content: flex-end;
         }
 
+        .load-more {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -464,9 +588,17 @@
                 font-size: 2rem;
             }
 
-            .dose-card {
-                grid-template-columns: auto 1fr;
-                gap: 1rem;
+            .option-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .appointment-header {
+                flex-direction: column;
+            }
+
+            .appointment-info {
+                margin-left: 0;
+                margin-top: 1rem;
             }
 
             .action-buttons {
@@ -477,13 +609,14 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            .appointment-window {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media print {
-
-            .btn,
-            .action-buttons,
-            .modal {
+            .btn, .action-buttons, .modal, .change-date-btn {
                 display: none !important;
             }
         }
