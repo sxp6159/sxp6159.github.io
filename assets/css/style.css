@@ -15,12 +15,12 @@
             --text-primary: #1a1a1a;
             --text-secondary: #4a4a4a;
             --border: #e0e0e0;
-            --shadow: rgba(10, 77, 60, 0.08);
+            --shadow: rgba(242, 82, 24, 0.08);
             --target-date: #4ade80;
             --flexible-window: #fef3c7;
         }
 
-              body {
+        body {
             font-family: 'Source Sans 3', sans-serif;
             background: linear-gradient(135deg, var(--background) 0%, #f0f9f4 100%);
             color: var(--text-primary);
@@ -88,7 +88,7 @@
         }
 
         .card:hover {
-            box-shadow: 0 8px 24px rgba(10, 77, 60, 0.12);
+            box-shadow: 0 8px 24px rgba(242, 82, 24, 0.12);
             transform: translateY(-2px);
         }
 
@@ -135,12 +135,12 @@
         .option-card:hover {
             border-color: var(--gsk-orange);
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(10, 77, 60, 0.15);
+            box-shadow: 0 8px 24px rgba(242, 82, 24, 0.15);
         }
 
         .option-card.selected {
             border-color: var(--gsk-orange);
-            background: linear-gradient(135deg, #e6f7f1 0%, #d4f1e8 100%);
+            background: linear-gradient(135deg, #fef3e8 0%, #fde9d9 100%);
         }
 
         .option-icon {
@@ -174,7 +174,6 @@
         }
 
         input[type="date"],
-        input[type="time"],
         select {
             width: 100%;
             padding: 0.75rem;
@@ -186,11 +185,10 @@
         }
 
         input[type="date"]:focus,
-        input[type="time"]:focus,
         select:focus {
             outline: none;
             border-color: var(--gsk-orange);
-            box-shadow: 0 0 0 3px rgba(22, 143, 111, 0.1);
+            box-shadow: 0 0 0 3px rgba(243, 102, 51, 0.1);
         }
 
         .btn {
@@ -215,7 +213,7 @@
         .btn-primary:hover {
             background: var(--primary-gsk-orange);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(10, 77, 60, 0.3);
+            box-shadow: 0 4px 12px rgba(242, 82, 24, 0.3);
         }
 
         .btn-secondary {
@@ -442,7 +440,7 @@
         }
 
         .month-nav button:hover {
-            background: rgba(10, 77, 60, 0.1);
+            background: rgba(242, 82, 24, 0.1);
         }
 
         .legend {

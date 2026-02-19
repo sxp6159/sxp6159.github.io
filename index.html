@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
-
 <body>
     <div class="container">
         <header>
@@ -128,17 +127,12 @@
                 <ul>
                     <li>This date will be used for all future injections each month</li>
                     <li>Select a day between the 1st and 28th for consistency in shorter months</li>
-                    <li>Choose a time that aligns with your clinic hours</li>
                     <li>Injections can be given ±7 days from this target if needed</li>
                 </ul>
             </div>
             <div class="input-group">
                 <label for="targetDate">Target Treatment Date:</label>
                 <input type="date" id="targetDate" required>
-            </div>
-            <div class="input-group">
-                <label for="targetTime">Preferred Appointment Time:</label>
-                <input type="time" id="targetTime" value="10:00" required>
             </div>
             <div id="dateWarning" class="warning-box hidden">
                 ⚠️ <strong>Note:</strong> Selected day is after the 28th. This may cause scheduling issues in months
@@ -304,7 +298,6 @@
 
             // Clear form inputs
             document.getElementById('targetDate').value = '';
-            document.getElementById('targetTime').value = '10:00';
             document.getElementById('oralCompleteDate').value = '';
             document.getElementById('dateWarning').classList.add('hidden');
 
@@ -331,7 +324,6 @@
 
         function generateSchedule() {
             const targetDateInput = document.getElementById('targetDate').value;
-            const targetTime = document.getElementById('targetTime').value;
 
             if (!targetDateInput) {
                 alert('Please select a target treatment date');
@@ -358,8 +350,7 @@
                     targetDate: new Date(appointmentDate),
                     selectedDate: new Date(appointmentDate),
                     windowStart: addDays(appointmentDate, -7),
-                    windowEnd: addDays(appointmentDate, 7),
-                    time: targetTime
+                    windowEnd: addDays(appointmentDate, 7)
                 });
             }
 
@@ -396,7 +387,7 @@
                             </div>
                             <div class="appointment-date">
                                 ${isModified ? '<span style="color: #f59e0b;">Modified:</span> ' : ''}
-                                ${formatDateLong(appointment.selectedDate)} at ${appointment.time}
+                                ${formatDateLong(appointment.selectedDate)}
                             </div>
                             ${isOutsideWindow ? '<div style="color: #dc2626; font-weight: 600; margin-top: 0.5rem;">⚠️ Outside flexible window</div>' : ''}
                         </div>
@@ -534,7 +525,7 @@
             const doc = new jsPDF();
 
             // Header
-            doc.setFillColor(10, 77, 60);
+            doc.setFillColor(242, 82, 24);
             doc.rect(0, 0, 210, 45, 'F');
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(24);
@@ -572,7 +563,7 @@
                 doc.setFont(undefined, 'normal');
                 doc.setFontSize(9);
                 yPos += 6;
-                doc.text(`Scheduled: ${formatDateLong(appointment.selectedDate)} at ${appointment.time}`, 25, yPos);
+                doc.text(`Scheduled: ${formatDateLong(appointment.selectedDate)}`, 25, yPos);
                 yPos += 5;
                 doc.text(`Target Date: ${formatDateShort(appointment.targetDate)}`, 25, yPos);
                 yPos += 5;
@@ -636,9 +627,8 @@
         }
 
         function downloadICS(appointment) {
-            const [hours, minutes] = appointment.time.split(':');
             const startDate = new Date(appointment.selectedDate);
-            startDate.setHours(parseInt(hours), parseInt(minutes), 0);
+            startDate.setHours(9, 0, 0); // Set to 9:00 AM as default
 
             const event = {
                 start: startDate,
