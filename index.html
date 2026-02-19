@@ -21,170 +21,386 @@
     <div class="container">
         <header>
             <h1>xVaccine Treatment Planner</h1>
-            <p class="subtitle">Schedule and manage your vaccination treatment plan</p>
+            <p class="subtitle">Long-acting injectable treatment scheduling</p>
         </header>
 
-        <!-- Step 1: Select Start Date -->
+        <!-- Step 1: Choose Treatment Type -->
         <div id="step1" class="card">
             <h2 class="card-title">
                 <span class="step-indicator">1</span>
-                Select Your First Treatment Date
+                Select Treatment Type
             </h2>
             <div class="info-box">
-                Choose the date you'd like to begin your xVaccine treatment. The system will automatically calculate
-                your complete 4-dose schedule.
+                Please select whether you are starting new treatment or continuing established long-acting treatment.
             </div>
-            <div class="input-group">
-                <label for="startDate">First Treatment Date:</label>
-                <input type="date" id="startDate" required>
-            </div>
-            <button class="btn btn-primary" onclick="generateSchedule()">
-                <span>Generate Treatment Schedule</span>
-                <span>→</span>
-            </button>
-        </div>
-
-        <!-- Step 2: Review and Modify Schedule -->
-        <div id="step2" class="card hidden">
-            <h2 class="card-title">
-                <span class="step-indicator">2</span>
-                Your Treatment Schedule
-            </h2>
-            <div class="info-box">
-                Target Treatment Dates are shown in <strong style="color: #22c55e;">green</strong>. If you cannot attend
-                on the target date, select an alternative within the <strong style="color: #f59e0b;">flexible window (±7
-                    days)</strong>.
-            </div>
-            <div id="scheduleList" class="schedule-grid"></div>
-
-            <div class="warning-box hidden" id="bridgingWarning">
-                ⚠️ <strong>Note:</strong> If you cannot receive treatment during the Flexible Dosing Window, please
-                consult with your healthcare provider about oral bridging options.
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn btn-secondary" onclick="showStep1()">
-                    ← Modify Start Date
-                </button>
-                <button class="btn btn-primary" onclick="downloadPDF()">
-                    📄 Download PDF
-                </button>
-                <button class="btn btn-primary" onclick="downloadAllICS()">
-                    📅 Export to Calendar
-                </button>
-            </div>
-        </div>
-
-        <!-- Calendar Modal -->
-        <div id="calendarModal" class="modal">
-            <div class="modal-content">
-                <h3 class="modal-title" id="modalTitle">Select Treatment Date</h3>
-                <div class="calendar-wrapper">
-                    <div class="month-nav">
-                        <button onclick="previousMonth()">‹</button>
-                        <h3 id="monthYear"></h3>
-                        <button onclick="nextMonth()">›</button>
-                    </div>
-                    <div class="calendar" id="calendar"></div>
-                    <div class="legend">
-                        <div class="legend-item">
-                            <div class="legend-color target"></div>
-                            <span>Target Date</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color flexible"></div>
-                            <span>Flexible Window (±7 days)</span>
-                        </div>
+            <div class="option-cards">
+                <div class="option-card" onclick="selectTreatmentType('new')">
+                    <div class="option-icon">🆕</div>
+                    <div class="option-title">Starting New Treatment</div>
+                    <div class="option-description">
+                        Begin long-acting injectable treatment with or without oral lead-in
                     </div>
                 </div>
-                <div class="modal-buttons">
-                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <div class="option-card" onclick="selectTreatmentType('continuation')">
+                    <div class="option-icon">🔄</div>
+                    <div class="option-title">Continuation Treatment</div>
+                    <div class="option-description">
+                        Already established on 2-month injection schedule
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2a: New Treatment - Lead-in Selection -->
+        <h2 class="card-title">
+            <span class="step-indicator">2</span>
+            Treatment Initiation Method
+        </h2>
+        <div class="info-box">
+            Choose how you will begin your long-acting injectable treatment.
+        </div>
+        <div class="option-cards">
+            <div class="option-card" onclick="selectLeadIn('oral')">
+                <div class="option-icon">💊</div>
+                <div class="option-title">With Oral Lead-in</div>
+                <div class="option-description">
+                    Complete 28 days of oral tablets before first injection
+                </div>
+            </div>
+            <div class="option-card" onclick="selectLeadIn('direct')">
+                <div class="option-icon">💉</div>
+                <div class="option-title">Direct to Injections</div>
+                <div class="option-description">
+                    Start immediately with monthly injections
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Step 2b: Oral Lead-in Confirmation -->
+    <div id="step2b" class="card hidden">
+        <h2 class="card-title">
+            <span class="step-indicator">2</span>
+            Oral Lead-in Completion
+        </h2>
+        <div class="warning-box">
+            <strong>Important:</strong> Before scheduling injections, you must complete at least 28 days of oral lead-in
+            therapy:
+            <ul>
+                <li>1 tablet of cabotegravir (30mg) daily</li>
+                <li>1 tablet of rilpivirine (25mg) daily</li>
+            </ul>
+        </div>
+        <div class="input-group">
+            <label for="oralCompleteDate">Date Oral Lead-in Completed (Day 28):</label>
+            <input type="date" id="oralCompleteDate" required>
+        </div>
+        <button class="btn btn-primary" onclick="proceedFromOralLeadIn()">
+            Continue to Schedule
+        </button>
+        <button class="btn btn-secondary" onclick="goBack('step2a')">
+            ← Back
+        </button>
+    </div>
+
+    <!-- Step 3: Target Date Selection -->
+    <div id="step3" class="card hidden">
+        <h2 class="card-title">
+            <span class="step-indicator">3</span>
+            Select Target Treatment Date
+        </h2>
+        <div class="info-box">
+            <strong>Choose your Target Treatment Date carefully:</strong>
+            <ul>
+                <li>This date will be used for all future injections each month</li>
+                <li>Select a day between the 1st and 28th for consistency in shorter months</li>
+                <li>Choose a time that aligns with your clinic hours</li>
+                <li>Injections can be given ±7 days from this target if needed</li>
+            </ul>
+        </div>
+        <div class="input-group">
+            <label for="targetDate">Target Treatment Date:</label>
+            <input type="date" id="targetDate" required>
+        </div>
+        <div class="input-group">
+            <label for="targetTime">Preferred Appointment Time:</label>
+            <input type="time" id="targetTime" value="10:00" required>
+        </div>
+        <div id="dateWarning" class="warning-box hidden">
+            ⚠️ <strong>Note:</strong> Selected day is after the 28th. This may cause scheduling issues in months with
+            fewer than 31 days. Consider selecting an earlier day of the month.
+        </div>
+        <button class="btn btn-primary" onclick="generateSchedule()">
+            Generate Schedule
+        </button>
+        <button class="btn btn-secondary" onclick="goBackFromStep3()">
+            ← Back
+        </button>
+    </div>
+
+    <!-- Step 4: Review Schedule -->
+    <div id="step4" class="card hidden">
+        <h2 class="card-title">
+            <span class="step-indicator">4</span>
+            Your Treatment Schedule
+        </h2>
+        <div class="info-box">
+            <strong>Target Treatment Date</strong> is shown in <strong style="color: #22c55e;">green</strong>.
+            If needed, you can schedule within the <strong style="color: #fbbf24;">Flexible Window (±7 days)</strong>.
+            Try to return to your Target Treatment Date for subsequent appointments.
+        </div>
+        <div id="scheduleList" class="schedule-grid"></div>
+
+        <div class="load-more hidden" id="loadMoreContainer">
+            <button class="btn btn-outline" onclick="loadMoreAppointments()">
+                Load Next 3 Appointments
+            </button>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="goBack('step3')">
+                ← Modify Settings
+            </button>
+            <button class="btn btn-primary" onclick="downloadPDF()">
+                📄 Download PDF
+            </button>
+            <button class="btn btn-primary" onclick="downloadAllICS()">
+                📅 Export to Calendar
+            </button>
+        </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div id="calendarModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">Select Appointment Date</h3>
+            <div class="calendar-wrapper">
+                <div class="month-nav">
+                    <button onclick="previousMonth()">‹</button>
+                    <h3 id="monthYear"></h3>
+                    <button onclick="nextMonth()">›</button>
+                </div>
+                <div class="calendar" id="calendar"></div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color target"></div>
+                        <span>Target Date</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color flexible"></div>
+                        <span>Flexible Window (±7 days)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
     <script>
-        // Treatment schedule configuration
-        const TREATMENT_CONFIG = {
-            doses: [
-                { number: 1, dayOffset: 0, name: "First Dose" },
-                { number: 2, dayOffset: 7, name: "Second Dose" },
-                { number: 3, dayOffset: 14, name: "Third Dose" },
-                { number: 4, dayOffset: 28, name: "Fourth Dose" }
-            ],
-            flexibleWindowDays: 7
-        };
-
+        // Global state
+        let treatmentType = null; // 'new' or 'continuation'
+        let leadInType = null; // 'oral' or 'direct' (for new treatment)
         let schedule = [];
-        let currentDoseIndex = null;
+        let currentAppointmentIndex = null;
         let currentCalendarMonth = new Date();
+        let visibleAppointments = 3;
+        const MAX_APPOINTMENTS = 12;
 
-        function generateSchedule() {
-            const startDateInput = document.getElementById('startDate').value;
-            if (!startDateInput) {
-                alert('Please select a start date');
+        function selectTreatmentType(type) {
+            treatmentType = type;
+            document.getElementById('step1').classList.add('hidden');
+
+            if (type === 'new') {
+                document.getElementById('step2a').classList.remove('hidden');
+            } else {
+                document.getElementById('step3').classList.remove('hidden');
+            }
+        }
+
+        function selectLeadIn(type) {
+            leadInType = type;
+            document.getElementById('step2a').classList.add('hidden');
+
+            if (type === 'oral') {
+                document.getElementById('step2b').classList.remove('hidden');
+                // Set minimum date to 28 days ago
+                const minDate = new Date();
+                minDate.setDate(minDate.getDate() - 28);
+                document.getElementById('oralCompleteDate').min = minDate.toISOString().split('T')[0];
+            } else {
+                document.getElementById('step3').classList.remove('hidden');
+            }
+        }
+
+        function proceedFromOralLeadIn() {
+            const oralCompleteDate = document.getElementById('oralCompleteDate').value;
+            if (!oralCompleteDate) {
+                alert('Please select the date you completed oral lead-in');
                 return;
             }
 
-            const startDate = new Date(startDateInput + 'T00:00:00');
-            schedule = TREATMENT_CONFIG.doses.map(dose => ({
-                ...dose,
-                targetDate: addDays(startDate, dose.dayOffset),
-                selectedDate: addDays(startDate, dose.dayOffset),
-                windowStart: addDays(startDate, dose.dayOffset - TREATMENT_CONFIG.flexibleWindowDays),
-                windowEnd: addDays(startDate, dose.dayOffset + TREATMENT_CONFIG.flexibleWindowDays)
-            }));
+            document.getElementById('step2b').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+
+            // Set minimum target date to day after oral completion
+            const minDate = new Date(oralCompleteDate + 'T00:00:00');
+            minDate.setDate(minDate.getDate() + 1);
+            document.getElementById('targetDate').min = minDate.toISOString().split('T')[0];
+        }
+
+        function goBack(targetStep) {
+            // Hide all steps
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2a').classList.add('hidden');
+            document.getElementById('step2b').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.add('hidden');
+
+            // Show target step
+            document.getElementById(targetStep).classList.remove('hidden');
+        }
+
+        function goBackFromStep3() {
+            if (treatmentType === 'new') {
+                if (leadInType === 'oral') {
+                    goBack('step2b');
+                } else {
+                    goBack('step2a');
+                }
+            } else {
+                goBack('step1');
+            }
+        }
+
+        // Check if selected day is after 28th
+        document.getElementById('targetDate').addEventListener('change', function () {
+            const date = new Date(this.value + 'T00:00:00');
+            const day = date.getDate();
+            const warning = document.getElementById('dateWarning');
+
+            if (day > 28) {
+                warning.classList.remove('hidden');
+            } else {
+                warning.classList.add('hidden');
+            }
+        });
+
+        function generateSchedule() {
+            const targetDateInput = document.getElementById('targetDate').value;
+            const targetTime = document.getElementById('targetTime').value;
+
+            if (!targetDateInput) {
+                alert('Please select a target treatment date');
+                return;
+            }
+
+            const targetDate = new Date(targetDateInput + 'T00:00:00');
+            const intervalMonths = treatmentType === 'continuation' ? 2 : 1;
+
+            schedule = [];
+            visibleAppointments = 3;
+
+            for (let i = 0; i < MAX_APPOINTMENTS; i++) {
+                const appointmentDate = addMonths(targetDate, i * intervalMonths);
+                const targetDay = targetDate.getDate();
+
+                // Adjust for months with fewer days
+                if (appointmentDate.getDate() !== targetDay) {
+                    appointmentDate.setDate(0); // Go to last day of previous month
+                }
+
+                schedule.push({
+                    number: i + 1,
+                    targetDate: new Date(appointmentDate),
+                    selectedDate: new Date(appointmentDate),
+                    windowStart: addDays(appointmentDate, -7),
+                    windowEnd: addDays(appointmentDate, 7),
+                    time: targetTime
+                });
+            }
 
             displaySchedule();
-            document.getElementById('step1').classList.add('hidden');
-            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.remove('hidden');
         }
 
         function displaySchedule() {
             const container = document.getElementById('scheduleList');
             container.innerHTML = '';
 
-            schedule.forEach((dose, index) => {
-                const card = document.createElement('div');
-                card.className = 'dose-card';
+            const displayCount = Math.min(visibleAppointments, schedule.length);
 
-                const isModified = dose.selectedDate.getTime() !== dose.targetDate.getTime();
-                const isOutsideWindow = !isDateInRange(dose.selectedDate, dose.windowStart, dose.windowEnd);
+            for (let i = 0; i < displayCount; i++) {
+                const appointment = schedule[i];
+                const card = document.createElement('div');
+                card.className = 'appointment-card';
+
+                const isModified = appointment.selectedDate.getTime() !== appointment.targetDate.getTime();
+                const isOutsideWindow = !isDateInRange(
+                    appointment.selectedDate,
+                    appointment.windowStart,
+                    appointment.windowEnd
+                );
 
                 card.innerHTML = `
-                    <div class="dose-number">${dose.number}</div>
-                    <div class="dose-info">
-                        <div class="dose-title">${dose.name}</div>
-                        <div class="dose-date">
-                            ${isModified ? '<strong>Modified:</strong> ' : ''}
-                            ${formatDate(dose.selectedDate)}
+                    <div class="appointment-header">
+                        <div class="appointment-number">${appointment.number}</div>
+                        <div class="appointment-info">
+                            <div class="appointment-title">
+                                ${treatmentType === 'continuation' ? 'Continuation' : 'Treatment'} 
+                                Injection ${appointment.number}
+                            </div>
+                            <div class="appointment-date">
+                                ${isModified ? '<span style="color: #f59e0b;">Modified:</span> ' : ''}
+                                ${formatDateLong(appointment.selectedDate)} at ${appointment.time}
+                            </div>
+                            ${isOutsideWindow ? '<div style="color: #dc2626; font-weight: 600; margin-top: 0.5rem;">⚠️ Outside flexible window</div>' : ''}
                         </div>
-                        <div class="dose-window">
-                            Target: ${formatDate(dose.targetDate)} 
-                            (Window: ${formatDate(dose.windowStart)} - ${formatDate(dose.windowEnd)})
-                        </div>
-                        ${isOutsideWindow ? '<div style="color: #dc2626; font-weight: 600; margin-top: 0.5rem;">⚠️ Outside flexible window - consult provider</div>' : ''}
+                        <button class="change-date-btn" onclick="openCalendar(${i})">
+                            Change Date
+                        </button>
                     </div>
-                    <button class="btn btn-secondary" onclick="openCalendar(${index})" style="white-space: nowrap;">
-                        Change Date
-                    </button>
+                    <div class="appointment-window">
+                        <div class="window-item earliest">
+                            <span class="window-label">Earliest Date:</span>
+                            <span class="window-date">${formatDateShort(appointment.windowStart)}</span>
+                        </div>
+                        <div class="window-item target">
+                            <span class="window-label">Target Date:</span>
+                            <span class="window-date">${formatDateShort(appointment.targetDate)}</span>
+                        </div>
+                        <div class="window-item latest">
+                            <span class="window-label">Latest Date:</span>
+                            <span class="window-date">${formatDateShort(appointment.windowEnd)}</span>
+                        </div>
+                    </div>
                 `;
                 container.appendChild(card);
-            });
+            }
 
-            // Show warning if any dose is outside flexible window
-            const hasOutsideWindow = schedule.some(dose =>
-                !isDateInRange(dose.selectedDate, dose.windowStart, dose.windowEnd)
-            );
-            document.getElementById('bridgingWarning').classList.toggle('hidden', !hasOutsideWindow);
+            // Show/hide load more button
+            const loadMoreContainer = document.getElementById('loadMoreContainer');
+            if (visibleAppointments < MAX_APPOINTMENTS) {
+                loadMoreContainer.classList.remove('hidden');
+            } else {
+                loadMoreContainer.classList.add('hidden');
+            }
         }
 
-        function openCalendar(doseIndex) {
-            currentDoseIndex = doseIndex;
-            const dose = schedule[doseIndex];
-            document.getElementById('modalTitle').textContent = `Select Date for ${dose.name}`;
-            currentCalendarMonth = new Date(dose.selectedDate);
+        function loadMoreAppointments() {
+            visibleAppointments = Math.min(visibleAppointments + 3, MAX_APPOINTMENTS);
+            displaySchedule();
+        }
+
+        function openCalendar(appointmentIndex) {
+            currentAppointmentIndex = appointmentIndex;
+            const appointment = schedule[appointmentIndex];
+            document.getElementById('modalTitle').textContent =
+                `Select Date for Appointment ${appointment.number}`;
+            currentCalendarMonth = new Date(appointment.selectedDate);
             renderCalendar();
             document.getElementById('calendarModal').classList.add('active');
         }
@@ -194,7 +410,7 @@
         }
 
         function renderCalendar() {
-            const dose = schedule[currentDoseIndex];
+            const appointment = schedule[currentAppointmentIndex];
             const year = currentCalendarMonth.getFullYear();
             const month = currentCalendarMonth.getMonth();
 
@@ -232,13 +448,13 @@
                 day.className = 'calendar-day';
                 day.textContent = i;
 
-                if (isSameDay(currentDate, dose.targetDate)) {
+                if (isSameDay(currentDate, appointment.targetDate)) {
                     day.classList.add('target');
-                } else if (isDateInRange(currentDate, dose.windowStart, dose.windowEnd)) {
+                } else if (isDateInRange(currentDate, appointment.windowStart, appointment.windowEnd)) {
                     day.classList.add('flexible');
                 }
 
-                if (isSameDay(currentDate, dose.selectedDate)) {
+                if (isSameDay(currentDate, appointment.selectedDate)) {
                     day.classList.add('selected');
                 }
 
@@ -247,7 +463,7 @@
             }
 
             // Next month days
-            const remainingDays = 42 - calendar.children.length + 7; // +7 for headers
+            const remainingDays = 42 - calendar.children.length + 7;
             for (let i = 1; i <= remainingDays; i++) {
                 const day = document.createElement('div');
                 day.className = 'calendar-day other-month';
@@ -267,14 +483,9 @@
         }
 
         function selectDate(date) {
-            schedule[currentDoseIndex].selectedDate = new Date(date);
+            schedule[currentAppointmentIndex].selectedDate = new Date(date);
             displaySchedule();
             closeModal();
-        }
-
-        function showStep1() {
-            document.getElementById('step1').classList.remove('hidden');
-            document.getElementById('step2').classList.add('hidden');
         }
 
         function downloadPDF() {
@@ -283,96 +494,116 @@
 
             // Header
             doc.setFillColor(10, 77, 60);
-            doc.rect(0, 0, 210, 40, 'F');
+            doc.rect(0, 0, 210, 45, 'F');
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(24);
             doc.setFont(undefined, 'bold');
-            doc.text('xVaccine Treatment Plan', 20, 25);
+            doc.text('xVaccine Treatment Plan', 20, 20);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'normal');
+            doc.text(`${treatmentType === 'continuation' ? 'Continuation' : 'New'} Treatment Schedule`, 20, 30);
+            if (treatmentType === 'new' && leadInType === 'oral') {
+                doc.text('With Oral Lead-in', 20, 37);
+            }
 
             // Patient info
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(10);
-            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 50);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 55);
+            doc.text(`Interval: ${treatmentType === 'continuation' ? '2 months' : '1 month'}`, 20, 61);
 
             // Schedule table
-            let yPos = 70;
-            doc.setFontSize(16);
+            let yPos = 75;
+            doc.setFontSize(14);
             doc.setFont(undefined, 'bold');
-            doc.text('Treatment Schedule', 20, yPos);
-            yPos += 10;
+            doc.text('Appointment Schedule', 20, yPos);
+            yPos += 8;
 
-            schedule.forEach((dose, index) => {
-                doc.setFontSize(12);
+            const displayCount = Math.min(visibleAppointments, schedule.length);
+
+            for (let i = 0; i < displayCount; i++) {
+                const appointment = schedule[i];
+
+                doc.setFontSize(11);
                 doc.setFont(undefined, 'bold');
-                doc.text(`${dose.name}`, 20, yPos);
+                doc.text(`Appointment ${appointment.number}`, 20, yPos);
 
                 doc.setFont(undefined, 'normal');
-                doc.setFontSize(10);
-                yPos += 7;
-                doc.text(`Scheduled Date: ${formatDate(dose.selectedDate)}`, 30, yPos);
+                doc.setFontSize(9);
+                yPos += 6;
+                doc.text(`Scheduled: ${formatDateLong(appointment.selectedDate)} at ${appointment.time}`, 25, yPos);
                 yPos += 5;
-                doc.text(`Target Date: ${formatDate(dose.targetDate)}`, 30, yPos);
+                doc.text(`Target Date: ${formatDateShort(appointment.targetDate)}`, 25, yPos);
                 yPos += 5;
-                doc.text(`Flexible Window: ${formatDate(dose.windowStart)} to ${formatDate(dose.windowEnd)}`, 30, yPos);
+                doc.text(`Earliest: ${formatDateShort(appointment.windowStart)} | Latest: ${formatDateShort(appointment.windowEnd)}`, 25, yPos);
 
-                const isOutsideWindow = !isDateInRange(dose.selectedDate, dose.windowStart, dose.windowEnd);
+                const isOutsideWindow = !isDateInRange(
+                    appointment.selectedDate,
+                    appointment.windowStart,
+                    appointment.windowEnd
+                );
                 if (isOutsideWindow) {
                     doc.setTextColor(220, 38, 38);
                     yPos += 5;
-                    doc.text('⚠ Outside flexible window - consult healthcare provider', 30, yPos);
+                    doc.text('Outside flexible window', 25, yPos);
                     doc.setTextColor(0, 0, 0);
                 }
 
-                yPos += 15;
+                yPos += 12;
 
                 if (yPos > 250) {
                     doc.addPage();
                     yPos = 20;
                 }
-            });
+            }
 
             // Important notes
-            yPos += 10;
-            if (yPos > 240) {
+            yPos += 5;
+            if (yPos > 230) {
                 doc.addPage();
                 yPos = 20;
             }
 
-            doc.setFontSize(14);
+            doc.setFontSize(12);
             doc.setFont(undefined, 'bold');
-            doc.text('Important Notes:', 20, yPos);
-            yPos += 10;
+            doc.text('Important Information:', 20, yPos);
+            yPos += 8;
 
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setFont(undefined, 'normal');
             const notes = [
-                '• Target dates are optimal for treatment efficacy',
-                '• Flexible window allows ±7 days from target date',
-                '• If unable to attend within flexible window, consult your healthcare provider',
-                '• Bring this schedule to all appointments',
-                '• Contact your healthcare provider if you have questions'
+                '• Target dates represent optimal treatment timing',
+                '• Flexible window allows scheduling ±7 days from target date',
+                '• Return to your original target date for subsequent injections when possible',
+                '• If unable to attend within flexible window, contact your healthcare provider',
+                '• Bring this schedule to all appointments'
             ];
 
             notes.forEach(note => {
                 doc.text(note, 20, yPos);
-                yPos += 7;
+                yPos += 6;
             });
 
-            doc.save('xVaccine-Treatment-Plan.pdf');
+            doc.save('xVaccine-Treatment-Schedule.pdf');
         }
 
         function downloadAllICS() {
-            schedule.forEach(dose => {
-                downloadICS(dose);
-            });
+            const displayCount = Math.min(visibleAppointments, schedule.length);
+            for (let i = 0; i < displayCount; i++) {
+                downloadICS(schedule[i]);
+            }
         }
 
-        function downloadICS(dose) {
+        function downloadICS(appointment) {
+            const [hours, minutes] = appointment.time.split(':');
+            const startDate = new Date(appointment.selectedDate);
+            startDate.setHours(parseInt(hours), parseInt(minutes), 0);
+
             const event = {
-                start: dose.selectedDate,
-                duration: 60, // 1 hour appointment
-                title: `xVaccine - ${dose.name}`,
-                description: `xVaccine Treatment - ${dose.name}\\n\\nTarget Date: ${formatDate(dose.targetDate)}\\nFlexible Window: ${formatDate(dose.windowStart)} to ${formatDate(dose.windowEnd)}\\n\\nPlease arrive 15 minutes early for check-in.`,
+                start: startDate,
+                duration: 60,
+                title: `xVaccine - Appointment ${appointment.number}`,
+                description: `xVaccine ${treatmentType === 'continuation' ? 'Continuation' : 'Treatment'} Injection\\n\\nTarget Date: ${formatDateShort(appointment.targetDate)}\\nFlexible Window: ${formatDateShort(appointment.windowStart)} to ${formatDateShort(appointment.windowEnd)}\\n\\nPlease arrive 15 minutes early.`,
                 location: 'Healthcare Provider Office',
                 url: ''
             };
@@ -381,7 +612,7 @@
             const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `xVaccine-Dose-${dose.number}.ics`;
+            link.download = `xVaccine-Appointment-${appointment.number}.ics`;
             link.click();
         }
 
@@ -399,7 +630,7 @@ BEGIN:VEVENT
 DTSTART:${startDate}
 DTEND:${endDate}
 DTSTAMP:${now}
-UID:${Date.now()}@xvaccine-planner
+UID:${Date.now()}-${Math.random()}@xvaccine-planner
 SUMMARY:${event.title}
 DESCRIPTION:${event.description}
 LOCATION:${event.location}
@@ -421,15 +652,29 @@ END:VCALENDAR`;
             return result;
         }
 
+        function addMonths(date, months) {
+            const result = new Date(date);
+            result.setMonth(result.getMonth() + months);
+            return result;
+        }
+
         function addMinutes(date, minutes) {
             return new Date(date.getTime() + minutes * 60000);
         }
 
-        function formatDate(date) {
+        function formatDateLong(date) {
             return date.toLocaleDateString('en-US', {
-                weekday: 'short',
+                weekday: 'long',
                 year: 'numeric',
                 month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function formatDateShort(date) {
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
                 day: 'numeric'
             });
         }
@@ -455,7 +700,8 @@ END:VCALENDAR`;
         }
 
         // Set minimum date to today
-        document.getElementById('startDate').min = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('targetDate').min = today;
 
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {
